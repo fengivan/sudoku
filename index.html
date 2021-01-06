@@ -41,7 +41,7 @@
                 line-height:50px;
                 border-style:solid;
             }
-            .solve
+            .hint
             {
                 width:100px;
                 height:50px;
@@ -54,8 +54,21 @@
                 line-height:50px;
                 border-style:solid;
             }
+            .solve
+            {
+                width:100px;
+                height:50px;
+                top:75px;
+                left:1040px;
+                position:absolute;
+                background-color:grey;
+                text-align:center;
+                font-size:2em;
+                line-height:50px;
+                border-style:solid;
+            }
             
-            .edit:hover,.clear:hover, .solve:hover{
+            .edit:hover,.clear:hover, .solve:hover, .hint:hover{
                 background-color:lightgrey;
             }
             
@@ -70,22 +83,28 @@
         <div class= "grid">  </div>
         <div class = "edit"> Edit</div>
         <div class = "clear"> Clear</div>
+        <div class = "hint"> Hint</div>
         <div class = "solve"> Solve</div>
     </body>
         <script> 
         //grid system is top to bottom, then left to right, 0,1,2,3,4, then 9 is the next column etc. 
             let box=document.querySelector(".grid");
             let clrbtn=document.querySelector(".clear");
+            let hintbtn=document.querySelector(".hint");
             let slvbtn=document.querySelector(".solve");
+
             clrbtn.addEventListener("mousedown", clear);
-            slvbtn.addEventListener("mousedown",solve);   
+            hintbtn.addEventListener("mousedown",hint);   
+            slvbtn.addEventListener("mousedown", solve);
             box.addEventListener("mousemove", track);
             window.addEventListener("keydown", input);
+            
             let mousex=0;
             let mousey=0;
             let hovercolor="lightgreen";
             let numbers=fillbox();
-/*
+            
+            /*
             console.log(numbers[2][2]);
             numbers[2][2].innerHTML=5;
             numbers[1][2].innerHTML=1;
@@ -94,36 +113,238 @@
             numbers[2][1].innerHTML=3;
             */
 
-            function solve()
-            {
-                let possibilities=[];
+            numbers[2][0].innerHTML=4;
+            numbers[1][1].innerHTML=8;
+            numbers[2][2].innerHTML=1;
+            numbers[0][3].innerHTML=3;
+            numbers[1][4].innerHTML=5;
+            numbers[2][5].innerHTML=8;
+            numbers[0][8].innerHTML=4;
+            numbers[1][7].innerHTML=9;
+            numbers[1][6].innerHTML=2;
 
+
+            numbers[3][0].innerHTML=8;
+            numbers[3][1].innerHTML=1;
+            numbers[3][2].innerHTML=3;
+            
+            numbers[4][0].innerHTML=6;
+            numbers[4][1].innerHTML=7;
+            numbers[4][2].innerHTML=2;
+            numbers[5][2].innerHTML=9;
+
+
+            numbers[3][3].innerHTML=5;
+            numbers[3][6].innerHTML=6;
+
+
+            numbers[4][3].innerHTML=4;
+            numbers[4][5].innerHTML=3;
+            numbers[5][5].innerHTML=1;
+
+            numbers[4][6].innerHTML=9;
+            numbers[4][7].innerHTML=5;
+            numbers[4][8].innerHTML=1;
+            numbers[5][6].innerHTML=7;
+            numbers[5][7].innerHTML=8;
+            numbers[5][8].innerHTML=3;
+
+
+            numbers[8][0].innerHTML=1;
+            numbers[7][1].innerHTML=3;
+            numbers[7][2].innerHTML=5;
+
+            numbers[6][3].innerHTML=9;
+            numbers[7][4].innerHTML=4;
+            numbers[8][5].innerHTML=7;
+
+
+            numbers[6][6].innerHTML=3;
+            numbers[7][7].innerHTML=2;
+            numbers[6][8].innerHTML=8;
+            
+            console.log(solved());
+            function getposval()
+            {
+                let p=[];
                 for(let i =0; i<9; i++)
                 {
-                    possibilities.push([]);
+                    p.push([]);
                     for(let j=0; j<9; j++)
                     {
-                        possibilities[i].push([]);
-                        let list=[];
-                        for(let k=1; k<=9; k++)
+                        p[i].push([]);
+                        if(numbers[i][j].innerHTML=="")
                         {
-                            if(possible(k, [i,j]))
-                                list.push(k);
+                            let list=[];
+                            for(let k=1; k<=9; k++)
+                            {
+                                if(possible(k, [i,j]))
+                                    list.push(k);
+                            }
+                                p[i][j]=list;
                         }
-                        if(list.length==1)
-                            numbers[i][j].innerHTML=list[0];
-                        else
-                            possibilities[i][j]=list;
                     }
-
                 }
-
-                console.log(possibilities[0][0]);
-
-                //go through possibilities, iterate values from 1 to 9
-                //for 1, if nothing on that row or column or box has 1 in possibilities, that that spot has to be one,
+                return p;
             }
 
+            function solve()
+            {
+                
+                while(hint())
+                {  
+                    if(solved())
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+
+
+
+            function guess(pos)
+            {
+                let min=Infinity;
+                let spot=[];
+                for(let i =0; i<9; i++)
+                {
+                    for(let j=0; j<9; j++)
+                    {
+                        if(pos[i][j].length<min &&numbers[i][j].innerHTML=="")
+                        {
+                            min=pos[i][j].length;
+                            spot=[i,j];
+                        }
+                    }
+                }
+                console.log(spot);
+            }
+
+            function solved()
+            {
+                for(i=0; i<9; i++)
+                {
+                    for(j=0; j<9; j++)
+                    {
+                        if(numbers[i][j].innerHTML=="")
+                            return false;
+                    }
+                }
+                return true;
+            }
+
+            function method1(pos)           //basic logic, if there's only 1 number that can go in a spot, fill that spot with the number.
+            {
+                for(let i =0; i<9; i++)             
+                {
+                    for(let j=0; j<9; j++)
+                    {
+                        if(pos[i][j].length==1)
+                            {
+                                numbers[i][j].innerHTML=pos[i][j][0];
+                                numbers[i][j].style.backgroundColor="pink";
+                                return true;
+                            }
+                    }
+                }
+                return false;
+            }
+
+            function method2(pos)               //column logic, if there's only 1 spot for a number in that column, it goes in that spot.
+            {
+                for(let i =0; i<9; i++)                                         
+                {
+                    for(let j=1; j<=9; j++)
+                    {
+                            let temp=[];
+                            for(let k=0; k<9; k++)
+                            {
+                                if(pos[i][k].includes(j)&&(numbers[i][k].innerHTML==""))
+                                    temp.push(k);
+                            }
+                            if(temp.length==1)
+                            {
+                                numbers[i][temp[0]].innerHTML=j;
+                                numbers[i][temp[0]].style.backgroundColor="yellow";
+                                return true;
+                            }
+                    }
+                }
+                return false;
+            }
+
+            function method3(pos)               //row logic, if there's only 1 spot for a number in that row, it goes in that spot.
+            {
+                for(let k =0; k<9; k++)                                         
+                {
+                    for(let j=1; j<=9; j++)
+                    {
+                            let temp=[];
+                            for(let i=0; i<9; i++)
+                            {
+                                if(pos[i][k].includes(j)&&(numbers[i][k].innerHTML==""))
+                                    temp.push(i);
+                            }
+                            if(temp.length==1)
+                            {
+                                numbers[temp[0]][k].innerHTML=j;
+                                numbers[temp[0]][k].style.backgroundColor="purple";
+                                return true;
+                            }
+                        
+                    }
+                }
+                return false;
+            }
+
+            function method4(pos)               //3x3 box logic, if there's only 1 spot for a number in a box, set that spot to that number.
+            {
+                for(let i=0; i<3; i++)                                              
+                {
+                    for(let j=0; j<3; j++)
+                    {
+                        for(let k=1; k<9; k++)
+                        {
+                            let temp=[]
+                            for(let ii=0; ii<3; ii++)
+                            {
+                                for(let jj=0; jj<3; jj++)
+                                {
+                                    if(pos[3*i+ii][3*j+jj].includes(k)&&numbers[3*i+ii][3*j+jj].innerHTML=="")
+                                        {
+                                            temp.push(ii);
+                                            temp.push(jj);
+                                        }
+                                }
+                            }
+                            if(temp.length==2)
+                            {
+                                console.log("box "+i + " " + j);
+                                numbers[3*i+temp[0]][3*j+temp[1]].innerHTML=k;
+                                numbers[3*i+temp[0]][3*j+temp[1]].style.backgroundColor="blue";
+                                return true;
+                            }   
+                        }
+                    }
+                }
+                return false;
+            }
+
+            function hint()
+            {
+                let possibilities=getposval();
+                if(method1(possibilities))
+                    return true;
+                if(method2(possibilities))
+                    return true;
+                if(method3(possibilities))
+                    return true;
+                if(method4(possibilities))
+                    return true;
+                return false;
+            }
 
             function clear()
             {
@@ -132,6 +353,7 @@
                     for(let j=0; j<9; j++)
                     {
                         numbers[i][j].innerHTML="";
+                        numbers[i][j].style.backgroundColor="white";
                     }
                 }
             }
