@@ -12,29 +12,14 @@ hintbtn.addEventListener("mousedown",hint);
 slvbtn.addEventListener("mousedown", solve);
 box.addEventListener("mousemove", track);
 window.addEventListener("keydown", input);
-
     
 let editing=false;                              //flag for editing mode
 let mousex=0;                                   //current mouse position
 let mousey=0;
 let numbers=initialize();                       //numbers is a 9x9 array of divs, each div contains the number on the grid.
 testcase();                                     //adds the test case to numbers
-
 let grid=getgrid();                             //grid is a 9x9 array of numbers, 0 is blank, 1-9 are numbers.
-let certain=[];                                 //certain is an array of numbers we have so far that are certain, used with hint function
 
-for(let i =0 ;i<9; i++)                         //sets current filled out positions to certain
-{
-    let temp=[];
-    for(let j =0; j<9; j++)
-    {
-        temp.push(grid[i][j]!=0);
-    }
-    certain.push(temp);
-}
-
-let posval=getposval();                         //gets the list of possible values at each position
-fillscreen();                                   //fills the screen with grid
 
 function edit()                                                         //button links here to toggle edit flag
 {
@@ -43,11 +28,10 @@ function edit()                                                         //button
 
 function solve()                                                        //button links here, runs solution and prints grid to the screen
 {
-    solution();
-    if(!solved())
+    if(!solution())
     {
         g=getgrid();
-        window.confirm("No solution");
+        window.confirm("No Solution");
         return false;
     }
     fillscreen();
@@ -56,35 +40,55 @@ function solve()                                                        //button
 
 function hint()                                                         //button links here, solves the grid and fills out one spot on the grid. 
 {
-    let temp=emptyspots();  
-    solution();             //gets the solution, then takes it off the grid.
-    if(!solved())
-        {
-            window.confirm("No solution");
-            g=getgrid();
-            return;
-        }
+    if(empty()[0]==-1)          //puzzle is done
+        return false;
 
-    let showspot = temp[parseInt(Math.random()*temp.length)];       //random spot that will be shown
-    certain[showspot[0]][showspot[1]]=true;
-
-    for(i=0; i<9; i++)
-        for(j=0; j<9; j++)
-            if(!certain[i][j])
-                grid[i][j]=0;
-
+    if(!solution())             //no possible solution
+    {
+        grid=getgrid();
+        window.confirm("No Solution");
+        return false;
+    }
+    let empties=emptyspots();   //get list of empty spots, fill in a random empty spot with grid, then set grid back to screen
+    let spot = empties[parseInt(Math.random()*empties.length)];
+    numbers[spot[0]][spot[1]].innerHTML=grid[spot[0]][spot[1]];
+    grid=getgrid();
     fillscreen();
-    posval=getposval();
 }
 
-function emptyspots()                                                   //returns an array of the empty spots on the grid
+function emptyspots()                                                   //returns a list of blank spots on the screen
 {
     let temp=[];
-    for(let i=0; i<9; i++)
+    for(let i =0; i<9; i++)
         for(let j =0; j<9; j++)
-            if(grid[i][j]==0)
+            if(numbers[i][j].innerHTML=="")
                 temp.push([i,j]);
     return temp;
+}
+
+function empty()                                                        //returns the first empty spot on the grid
+{
+    for(let i =0; i<9; i++)
+        for(let j=0; j<9; j++)
+            if(grid[i][j]==0)
+                return [i,j];
+    return [-1,-1];
+}
+
+function solution()                                                     //finds the solution to the grid recursively
+{
+    let p=empty();
+    if(p[0]==-1)
+        return true;
+    for(let i=9; i>=1; i--)
+    {
+        grid[p[0]][p[1]]=i;
+        if(possible(i, p) && solution())
+            return true;
+        else
+            grid[p[0]][p[1]]=0;
+    }
+    return false;
 }
 
 function testcase()                                                     //adds a base test case to the grid on load
@@ -92,8 +96,8 @@ function testcase()                                                     //adds a
     numbers[0][0].innerHTML=8;
     numbers[2][1].innerHTML=3;
     numbers[1][2].innerHTML=7;
-    numbers[0][1].innerHTML=9;
-    numbers[0][2].innerHTML=6;
+    //numbers[0][1].innerHTML=9;
+    //numbers[0][2].innerHTML=6;
     numbers[3][1].innerHTML=6;
     numbers[4][2].innerHTML=9;
     numbers[6][2].innerHTML=2;
@@ -112,222 +116,6 @@ function testcase()                                                     //adds a
     numbers[8][6].innerHTML=8;
     numbers[7][7].innerHTML=1;
     numbers[6][8].innerHTML=4;
-}
-
-function getposval()                                                    //returns a 9x9 grid of arrays. Each array contains the possible values at that position 
-{
-    let p=[];
-    for(let i =0; i<9; i++)
-    {
-        p.push([]);
-        for(let j=0; j<9; j++)
-        {
-            p[i].push([]);
-            if(grid[i][j]==0)
-            {
-                let list=[];
-                for(let k=1; k<=9; k++)
-                {
-                    if(possible(k, [i,j]))
-                        list.push(k);
-                }
-                    p[i][j]=list;
-            }
-        }
-    }
-    return p;
-}
-
-function solution()                                                     //attempts to find a solution to grid, with logic first then brute force
-{
-    logic();
-    if(solved())
-        return;
-
-    let empty=emptyspots();                                         //list of empty spots
-    let curposval=[];                                               //index of possible values we're trying, start at the frist possible value for each empty spot.
-    for(let i=0; i<empty.length; i++)
-        curposval.push(0);
-    
-    let i =0;                                                       //index of empty spots
-    let stopper=0;                                                  //loop breaker
-    
-    while(i>=0 && i<empty.length&&stopper<100000)
-    {
-        //console.log(i);
-        stopper++;
-        let temp=getposvals(empty[i][0], empty[i][1]);              //gets a list of possible vals at this spot
-    
-        if(curposval[i]>=temp.length)
-        {
-            grid[empty[i][0]][empty[i][1]]=0;
-            curposval[i]=0;
-            i--;;
-            continue;
-        }
-       
-        grid[empty[i][0]][empty[i][1]]=temp[curposval[i]];          //grid at first empty spot is equal to possible val at that empty spot at 0;
-        curposval[i]++;
-        posval=getposval();
-       
-        for(let a=i+1; a<empty.length; a++)                         //looks at all the remaining empty spots, checks to see if any have no possible numbers (if so the something's wrong)
-        {
-            if(getposvals(empty[a][0], empty[a][1]).length==0)
-            {
-                if(curposval[i]<temp.length)                        //still more untried possibilities at this position
-                {
-                    grid[empty[i][0]][empty[i][1]]=temp[curposval[i]];  
-                    curposval[i]++;
-                    a=i+1;                                          //go back to the start of the list
-                }
-                else                                                //this spot has ran out of possibilities, go back to the previous index and try the next possible value
-                {
-                    grid[empty[i][0]][empty[i][1]]=0;
-                    curposval[i]=0;
-                    i-=2;
-                    a=100;
-                }
-            }
-        }
-        i++;
-    } 
-    return;
-}
-
-function getposvals(i,j)                                                //returns an array of possible values at position i, j
-{
-    let temp=[];
-    for(let a=1; a<=9; a++)
-        if(possible(a, [i,j]))
-            temp.push(a);
-    return temp;
-}
-
-function solved()                                                       //checks if grid is filled out or not
-{
-    for(let i=0; i<9; i++)
-        for(let j=0; j<9; j++)
-            if(grid[i][j]==0)
-                return false;
-    return true;
-}
-
-function logic()                                                        //combines the logic of all 3 methods and runs them until nothing happens
-{
-    while(method1()||method2()||method3())
-            continue;
-        
-}
-
-function updateposval(i, j, val)                                        //if val has been inserted at i, j, update posval to remove val from column i and row j, and box i-j
-{
-    posval[i][j]=[];
-    for(let a=0; a<9; a++)
-    {
-        let temp=[];
-        for(let z=0; z<posval[i][a].length; z++)
-            if(posval[i][a][z]==val)
-                posval[i][a].splice(z, 1);
-
-        for(let z=0; z<posval[a][j].length; z++)        
-            if(posval[a][j][z]==val)
-                posval[a][j].splice(z,1);
-    }
-
-    let xbound=parseInt(i/3)*3;
-    let ybound=parseInt(j/3)*3;
-
-    for(let a=xbound; a<xbound+3; a++)
-        for(let b=ybound; b<ybound+3; b++)
-            for(let c=0; c<posval[a][b].length; c++)
-                if(posval[a][b][c]==val)
-                        posval[a][b].splice(c,1);
-}
-
-function method1()                                                      //basic logic, if there's only 1 number that can go in a spot, fill that spot with the number.
-{
-    let change=false;
-    for(let i =0; i<9; i++)             
-    {
-        for(let j=0; j<9; j++)
-        {
-            if(posval[i][j].length==1)
-                {
-                    grid[i][j]=posval[i][j];
-                    
-                    updateposval(i, j, grid[i][j]);
-                    change=true;
-                }
-        }
-    }
-    return change;
-}
-
-function method2()                                                      //row and logic, if there's only 1 spot for a number in that row/column, it goes in that spot.
-{
-    let change=false;
-    for(let i =0; i<9; i++)                                         
-    {
-        for(let j=1; j<=9; j++)
-        {
-                let temp=[];
-                let temp2=[]
-                for(let k=0; k<9; k++)
-                {
-                    if(posval[i][k].includes(j)&&(grid[i][k]==0))
-                        temp.push(k);
-                    if(posval[k][i].includes(j)&&(grid[k][i]==0))
-                        temp2.push(k);
-                }
-
-                if(temp.length==1)
-                {
-                    grid[i][temp[0]]=j;
-                    updateposval(i, temp[0], j);
-                    change=true;
-                }
-                if(temp2.length==1)
-                {
-                    grid[temp2[0]][i]=j;
-                    updateposval(temp2[0], i, j);
-                    change=true;
-                }
-        }
-    }
-    return change
-}
-
-function method3()                                                      //3x3 box logic, if there's only 1 spot for a number in a box, set that spot to that number.
-{
-    let change=false;
-    for(let i=0; i<3; i++)                                              
-    {
-        for(let j=0; j<3; j++)
-        {
-            for(let k=1; k<9; k++)
-            {
-                let temp=[]
-                for(let ii=0; ii<3; ii++)
-                {
-                    for(let jj=0; jj<3; jj++)
-                    {
-                        if(posval[3*i+ii][3*j+jj].includes(k)&&grid[3*i+ii][3*j+jj]==0)
-                            {
-                                temp.push(ii);
-                                temp.push(jj);
-                            }
-                    }
-                }
-                if(temp.length==2)
-                {
-                    grid[3*i+temp[0]][3*j+temp[1]]=k;
-                    updateposval(3*i+temp[0],3*j+temp[1], k);
-                    change=true;
-                }   
-            }
-        }
-    }
-    return change;
 }
 
 function fillscreen()                                                   //puts grid g on the screen
@@ -363,12 +151,10 @@ function clear()                                                        //button
         for(let j=0; j<9; j++)
         {
             grid[i][j]=0;
-            certain[i][j]=false;
             numbers[i][j].innerHTML="";
             numbers[i][j].style.backgroundColor="white";
         }
     }
-    posval=getposval();
 }
 
 function possible(num, position)                                        //takes in a num, an x/y position, and checks if the num can be placed in the position in grid
@@ -406,8 +192,6 @@ function input(e)                                                       //enters
     {
         currentbox.innerHTML="";
         grid[x][y]=0;
-        certain[x][y]=false;
-        posval=getposval();
         return;
     }
 
@@ -415,12 +199,10 @@ function input(e)                                                       //enters
     if(isNaN(key)||e.key===null||e.key===' ')
         return;
 
-    if(posval[x][y].includes(key))
+    if(possible(key, [x, y]))
     {
         currentbox.innerHTML=key;
         grid[x][y]=key;
-        updateposval(x,y,key);
-        certain[x][y]=true;
         fillscreen();
         flash(currentbox, "lightgreen");
     }
