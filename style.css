@@ -1,0 +1,75 @@
+.grid{
+    background-color:white;
+    position:absolute;
+}
+.box{
+    width:98px;
+    height:98px;
+    position:absolute;
+    font-size:4em;
+    text-align:center;
+    line-height:95px;
+}
+.smallbox
+{
+    width:50px;
+    height:20px;
+    position:absolute;
+    font-size:small;
+    text-align:left;
+    line-height:20px;
+}
+.edit
+{
+    width:100px;
+    height:50px;
+    left:925px;
+    position:absolute;
+    background-color:grey;
+    text-align:center;
+    font-size:2em;
+    line-height:50px;
+    border-style:solid;
+}
+.clear
+{
+    width:100px;
+    height:50px;
+    left:1040px;
+    position:absolute;
+    background-color:grey;
+    text-align:center;
+    font-size:2em;
+    line-height:50px;
+    border-style:solid;
+}
+.hint
+{
+    width:100px;
+    height:50px;
+    top:75px;
+    left:925px;
+    position:absolute;
+    background-color:grey;
+    text-align:center;
+    font-size:2em;
+    line-height:50px;
+    border-style:solid;
+}
+.solve
+{
+    width:100px;
+    height:50px;
+    top:75px;
+    left:1040px;
+    position:absolute;
+    background-color:grey;
+    text-align:center;
+    font-size:2em;
+    line-height:50px;
+    border-style:solid;
+}
+
+.edit:hover,.clear:hover, .solve:hover, .hint:hover{
+    background-color:lightgrey;
+}
