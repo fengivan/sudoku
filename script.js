@@ -1,13 +1,16 @@
 let box=document.querySelector(".grid");        //box holding the grid
 let clrbtn=document.querySelector(".clear");    //clear button
 let hintbtn=document.querySelector(".hint");
+let editbtn=document.querySelector(".edit");
 let slvbtn=document.querySelector(".solve");    //solve button
 clrbtn.addEventListener("mousedown", clear);
 hintbtn.addEventListener("mousedown",hint);   
 slvbtn.addEventListener("mousedown", solve);
 box.addEventListener("mousemove", track);
+editbtn.addEventListener("mousedown", edit);
 window.addEventListener("keydown", input);
 let answered=false;
+let editing=false;
 let mousex=0;
 let answer=[];
 let mousey=0;
@@ -32,6 +35,10 @@ for(let i =0 ;i<9; i++)
 let posval=getposval();             //gets the list of possible values at each position
 fillscreen();
 
+function edit()
+{
+    editing=!editing;
+}
 
 function solve()                                                        //button links here, runs solution and prints grid to the screen
 {
@@ -440,6 +447,14 @@ function input(e)                                                       //enters
     let x=parseInt(mousex/100);
     let y=parseInt(mousey/100);
     let currentbox=numbers[x][y];
+    if(editing)
+    {
+        currentbox.innerHTML="";
+        grid[x][y]=0;
+        posval=getposval();
+        return;
+    }
+
     let key=Number(e.key);
     if(isNaN(key)||e.key===null||e.key===' ')
         return;
