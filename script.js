@@ -46,6 +46,7 @@ function solve()                                                        //button
     solution();
     if(!solved())
     {
+        g=getgrid();
         window.confirm("No solution");
         return false;
     }
@@ -60,7 +61,7 @@ function hint()                                                         //button
     if(!solved())
         {
             window.confirm("No solution");
-            badpuzzle=true;
+            g=getgrid();
             return;
         }
 
@@ -88,42 +89,29 @@ function emptyspots()                                                   //return
 
 function testcase()                                                     //adds a base test case to the grid on load
 {
-    numbers[2][0].innerHTML=4;
-    numbers[1][1].innerHTML=8;
-    //numbers[2][2].innerHTML=1;
-    numbers[0][3].innerHTML=3;
-    //numbers[1][4].innerHTML=5;
-    numbers[2][5].innerHTML=8;
-    numbers[0][8].innerHTML=4;
-    numbers[1][7].innerHTML=9;
-    numbers[1][6].innerHTML=2;
-    numbers[3][0].innerHTML=8;
-    //numbers[3][1].innerHTML=1;
-    numbers[3][2].innerHTML=3;
-    //numbers[4][0].innerHTML=6;
-    //numbers[4][1].innerHTML=7;
-    //numbers[4][2].innerHTML=2;
-    //numbers[5][2].innerHTML=9;
-    //numbers[3][3].innerHTML=5;
-    //numbers[3][6].innerHTML=6;
-    //numbers[4][3].innerHTML=4;
-    numbers[4][5].innerHTML=3;
-    numbers[5][5].innerHTML=1;
-    //numbers[4][6].innerHTML=9;
-    //numbers[4][7].innerHTML=5;
-    //numbers[4][8].innerHTML=1;
-    //numbers[5][6].innerHTML=7;
-    //numbers[5][7].innerHTML=8;
-    numbers[5][8].innerHTML=3;
-    numbers[8][0].innerHTML=1;
-    numbers[7][1].innerHTML=3;
-    //numbers[7][2].innerHTML=5;
-    numbers[6][3].innerHTML=9;
-    numbers[7][4].innerHTML=4;
-    //numbers[8][5].innerHTML=7;
-    numbers[6][6].innerHTML=3;
-    //numbers[7][7].innerHTML=2;
-    numbers[6][8].innerHTML=8;
+    numbers[0][0].innerHTML=8;
+    numbers[2][1].innerHTML=3;
+    numbers[1][2].innerHTML=7;
+    numbers[0][1].innerHTML=9;
+    numbers[0][2].innerHTML=6;
+    numbers[3][1].innerHTML=6;
+    numbers[4][2].innerHTML=9;
+    numbers[6][2].innerHTML=2;
+    numbers[1][3].innerHTML=5;
+    numbers[5][3].innerHTML=7;
+    numbers[4][4].innerHTML=4;
+    numbers[5][4].innerHTML=5;
+    numbers[3][5].innerHTML=1;
+    numbers[6][4].innerHTML=7;
+    numbers[7][5].innerHTML=3;
+    numbers[2][6].innerHTML=1;
+    numbers[2][7].innerHTML=8;
+    numbers[1][8].innerHTML=9;
+    numbers[3][7].innerHTML=5;
+    numbers[7][6].innerHTML=6;
+    numbers[8][6].innerHTML=8;
+    numbers[7][7].innerHTML=1;
+    numbers[6][8].innerHTML=4;
 }
 
 function getposval()                                                    //returns a 9x9 grid of arrays. Each array contains the possible values at that position 
@@ -163,9 +151,10 @@ function solution()                                                     //attemp
     
     let i =0;                                                       //index of empty spots
     let stopper=0;                                                  //loop breaker
-    console.log(empty);
-    while(i>=0 && i<empty.length&&stopper<5000)
+    
+    while(i>=0 && i<empty.length&&stopper<100000)
     {
+        //console.log(i);
         stopper++;
         let temp=getposvals(empty[i][0], empty[i][1]);              //gets a list of possible vals at this spot
     
