@@ -10,15 +10,6 @@
     text-align:center;
     line-height:95px;
 }
-.smallbox
-{
-    width:50px;
-    height:20px;
-    position:absolute;
-    font-size:small;
-    text-align:left;
-    line-height:20px;
-}
 .edit
 {
     width:100px;
@@ -69,7 +60,6 @@
     line-height:50px;
     border-style:solid;
 }
-
 .edit:hover,.clear:hover, .solve:hover, .hint:hover{
     background-color:lightgrey;
 }
